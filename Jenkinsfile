@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     tools {
-        gradle 'gradle8.11.1'
         jdk 'jdk17'
         git 'Default'
     }
@@ -42,7 +41,7 @@ pipeline {
         stage('Build') {
             steps {
                 dir('todo-list') {
-                    bat "\"${tool 'gradle8.11.1'}/bin/gradle\" build"
+                    bat './gradlew.bat build'
                     bat 'dir build\\libs'
                 }
             }
@@ -51,7 +50,7 @@ pipeline {
         stage('Test') {
             steps {
                 dir('todo-list') {
-                    bat "\"${tool 'gradle8.11.1'}/bin/gradle\" test"
+                    bat './gradlew.bat test'
                 }
             }
         }
