@@ -22,45 +22,29 @@ pipeline {
             }
         }
 
-        stage('Initialize Git Repo') {
-            steps {
-                dir('todo-list') {
-                    bat 'git init'
-                }
-            }
-        }
-
         stage('Checkout Code') {
             steps {
-                dir('todo-list') {
-                    git url: 'https://github.com/VladislavGundorin/todo-list.git', branch: 'main'
-                }
+                git url: 'https://github.com/VladislavGundorin/todo-list.git', branch: 'main'
             }
         }
 
         stage('Build') {
             steps {
-                dir('todo-list') {
-                    bat './gradlew.bat build'
-                    bat 'dir build\\libs'
-                }
+                sh './gradlew clean build'
+                sh 'ls build/libs'
             }
         }
 
         stage('Test') {
             steps {
-                dir('todo-list') {
-                    bat './gradlew.bat test'
-                }
+                sh './gradlew test'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                dir('todo-list') {
-                    script {
-                        bat "docker build -t %DOCKER_IMAGE% ."
-                    }
+                script {
+                    sh "docker build -t ${DOCKER_IMAGE} ."
                 }
             }
         }
@@ -68,8 +52,10 @@ pipeline {
         stage('Run Application in Docker') {
             steps {
                 script {
-                    bat 'docker ps -q -f name=todo-list | findstr /r "." && docker stop todo-list && docker rm todo-list || echo "No container to remove"'
-                    bat "docker run -d --name todo-list -p 8081:8081 %DOCKER_IMAGE%"
+                    sh '''
+                        docker ps -q -f name=todo-list | grep -q . && docker stop todo-list && docker rm todo-list || echo "No container to remove"
+                        docker run -d --name todo-list -p 8081:8081 ${DOCKER_IMAGE}
+                    '''
                 }
             }
         }
