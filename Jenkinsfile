@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     tools {
-        gradle 'gradle8.11.1'
         jdk 'jdk17'
         git 'Default'
     }
@@ -35,27 +34,16 @@ pipeline {
         stage('Build') {
             steps {
                 dir('todo-list') {
-                    bat "\"${tool 'gradle8.11.1'}/bin/gradle\" clean build"
+                    bat './gradlew clean build'
                     bat 'dir build\\libs'
                 }
             }
         }
 
         stage('Test') {
-            parallel {
-                stage('Unit Tests') {
-                    steps {
-                        dir('todo-list') {
-                            bat "\"${tool 'gradle8.11.1'}/bin/gradle\" test"
-                        }
-                    }
-                }
-                stage('Integration Tests') {
-                    steps {
-                        dir('todo-list') {
-                            bat "\"${tool 'gradle8.11.1'}/bin/gradle\" integrationTest"
-                        }
-                    }
+            steps {
+                dir('todo-list') {
+                    bat './gradlew test'
                 }
             }
         }
@@ -82,8 +70,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    bat 'docker ps -q -f name=todo-list | findstr /r "." && docker stop todo-list && docker rm todo-list || echo "No container to remove"'
-                    bat "docker run -d --name todo-list -p %APP_PORT%:%APP_PORT% %DOCKER_IMAGE%"
+                    bat '''
+                        docker ps -q -f name=todo-list && docker stop todo-list && docker rm todo-list || echo "No container to remove"
+                        docker run -d --name todo-list -p %APP_PORT%:%APP_PORT% %DOCKER_IMAGE%
+                    '''
                 }
             }
         }
@@ -100,10 +90,10 @@ pipeline {
 
     post {
         success {
-            echo 'Сборка, тесты и развертывание в Docker завершились успешно!'
+            echo 'Сборка, тесты и деплой завершились успешно!'
         }
         failure {
-            echo 'Упс! Что-то пошло не так. Проверь логи!'
+            echo 'Упс! Что-то пошло не так. Проверьте логи сборки.'
         }
         always {
             cleanWs()
