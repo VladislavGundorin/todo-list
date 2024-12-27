@@ -33,17 +33,22 @@ pipeline {
 
         stage('Build') {
             steps {
-                dir('todo-list') {
-                    bat './gradlew clean build'
-                    bat 'dir build\\libs'
+                script {
+                    bat '''
+                        cd todo-list
+                        gradlew.bat clean build
+                    '''
                 }
             }
         }
 
         stage('Test') {
             steps {
-                dir('todo-list') {
-                    bat './gradlew test'
+                script {
+                    bat '''
+                        cd todo-list
+                        gradlew.bat test
+                    '''
                 }
             }
         }
