@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Заголовок</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        nav { margin-bottom: 20px; }
+        nav a { margin-right: 15px; text-decoration: none; color: #007BFF; }
+        nav a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="/">Главная</a>
+    <a href="/about">О нас</a>
+    <a href="/contact">Контакты</a>
+</nav>
+<div>
+    Spring Boot проект для Jenkins
+</div>
+<div>
+    <div th:replace="~{${content} :: content}">
+        Содержимое страницы
+    </div>
+</div>
+</body>
+</html>
