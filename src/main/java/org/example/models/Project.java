@@ -1,22 +1,31 @@
 package org.example.models;
 
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
 public class Project {
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     private String name;
-    private String description;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Task> tasks = new ArrayList<>();
 
     public Project() {}
 
-    public Project(String name, String description) {
+    public Project(String name) {
         this.name = name;
-        this.description = description;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -28,11 +37,12 @@ public class Project {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public List<Task> getTasks() {
+        return tasks;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void addTask(Task task) {
+        tasks.add(task);
+        task.setProject(this);
     }
 }

@@ -1,43 +1,37 @@
 package org.example.services;
 
 import org.example.models.Task;
+import org.example.models.Project;
+import org.example.repository.ProjectRepository;
+import org.example.repository.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TaskService {
-    private List<Task> tasks = new ArrayList<>();
-    private int currentId = 1;
+    @Autowired
+    private TaskRepository taskRepository;
 
-    public Task createTask(String title) {
-        Task task = new Task(title);
-        task.setId(currentId++);
-        tasks.add(task);
-        return task;
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    public Task createTask(String title, int projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found with ID: " + projectId));
+        Task task = new Task();
+        task.setTitle(title);
+        task.setProject(project);
+        return taskRepository.save(task);
     }
+
 
     public List<Task> getAllTasks() {
-        return tasks;
+        return taskRepository.findAll();
     }
 
-    public Optional<Task> getTaskById(int id) {
-        return tasks.stream().filter(t -> t.getId() == id).findFirst();
-    }
-
-    public Optional<Task> updateTask(int id, String title) {
-        for (Task task : tasks) {
-            if (task.getId() == id) {
-                task.setTitle(title);
-                return Optional.of(task);
-            }
-        }
-        return Optional.empty();
-    }
-
-    public boolean deleteTask(int id) {
-        return tasks.removeIf(task -> task.getId() == id);
+    public void deleteTask(int id) {
+        taskRepository.deleteById(id);
     }
 }

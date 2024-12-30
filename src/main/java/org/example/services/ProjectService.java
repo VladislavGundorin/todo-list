@@ -1,44 +1,32 @@
 package org.example.services;
 
 import org.example.models.Project;
+import org.example.repository.ProjectRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProjectService {
-    private List<Project> projects = new ArrayList<>();
-    private int currentId = 1;
+    @Autowired
+    private ProjectRepository projectRepository;
 
-    public Project createProject(String name, String description) {
-        Project project = new Project(name, description);
-        project.setId(currentId++);
-        projects.add(project);
-        return project;
+    public Project createProject(String name) {
+        Project project = new Project(name);
+        return projectRepository.save(project);
     }
 
     public List<Project> getAllProjects() {
-        return projects;
+        return projectRepository.findAll();
     }
 
     public Optional<Project> getProjectById(int id) {
-        return projects.stream().filter(p -> p.getId() == id).findFirst();
+        return projectRepository.findById(id);
     }
 
-    public Optional<Project> updateProject(int id, String name, String description) {
-        for (Project project : projects) {
-            if (project.getId() == id) {
-                project.setName(name);
-                project.setDescription(description);
-                return Optional.of(project);
-            }
-        }
-        return Optional.empty();
-    }
-
-    public boolean deleteProject(int id) {
-        return projects.removeIf(project -> project.getId() == id);
+    public void deleteProject(int id) {
+        projectRepository.deleteById(id);
     }
 }

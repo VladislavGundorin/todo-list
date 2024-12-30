@@ -6,18 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/projects")
 public class ProjectController {
-
     @Autowired
     private ProjectService projectService;
 
     @PostMapping
-    public Project createProject(@RequestBody Project project) {
-        return projectService.createProject(project.getName(), project.getDescription());
+    public Project createProject(@RequestParam String name) {
+        return projectService.createProject(name);
     }
 
     @GetMapping
@@ -26,19 +24,12 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}")
-    public Project getProjectById(@PathVariable int id) {
-        Optional<Project> project = projectService.getProjectById(id);
-        return project.orElse(null); // Вернём null, если проект не найден
-    }
-
-    @PutMapping("/{id}")
-    public Project updateProject(@PathVariable int id, @RequestBody Project project) {
-        Optional<Project> updatedProject = projectService.updateProject(id, project.getName(), project.getDescription());
-        return updatedProject.orElse(null); // Вернём null, если обновление не удалось
+    public Project getProjectById(@PathVariable Integer id) {
+        return projectService.getProjectById(id).orElse(null);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteProject(@PathVariable int id) {
-        return projectService.deleteProject(id) ? "Project deleted" : "Project not found";
+    public void deleteProject(@PathVariable Integer id) {
+        projectService.deleteProject(id);
     }
 }
